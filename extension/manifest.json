@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "Elit.JS Log",
+  "version": "0.6.0",
+  "description": "ดู log จาก @elitjs/log ในหน้าเว็บผ่าน DevTools panel — filter ตาม level/namespace, search, pause, และสั่งเปิด console echo ได้",
+  "devtools_page": "devtools.html",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@elitjs/log browser demo</title>
+    <style>
+      body {
+        font: 15px/1.6 system-ui, sans-serif;
+        max-width: 720px;
+        margin: 40px auto;
+        padding: 0 16px;
+        color: #222;
+      }
+      h1 { font-size: 22px; }
+      .hint {
+        background: #f4f6f8;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 12px 16px;
+        font-size: 13px;
+      }
+      .hint code { background: #e8eaec; padding: 1px 5px; border-radius: 4px; }
+      .btns { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0; }
+      button {
+        font: inherit;
+        padding: 6px 14px;
+        border: 1px solid #bbb;
+        border-radius: 6px;
+        background: #fff;
+        cursor: pointer;
+      }
+      button:hover { background: #f0f0f0; }
+      #live { font: 12px ui-monospace, monospace; color: #666; }
+    </style>
+  </head>
+  <body>
+    <h1>@elitjs/log browser demo</h1>
+
+    <p class="hint">
+      1) ติดตั้ง extension: <code>chrome://extensions</code> → เปิด Developer mode →
+      <b>Load unpacked</b> → เลือกโฟลเดอร์ <code>extension/</code><br />
+      2) เปิด DevTools (F12) → จะมี tab <b>Elit.JS Log</b> โผล่มา<br />
+      3) กดปุ่มด้านล่างเพื่อปั่น log แล้วดูใน panel — console จะสะอาดเพราะ echo default = warn
+    </p>
+
+    <p>
+      config console echo ได้ 3 ทาง (log ยังเข้า panel ครบเสมอไม่ว่าจะตั้งค่าไหน):
+      <a href="?console=0">ปิดหมด</a> ·
+      <a href="?console=debug">แสดงทุกอย่าง</a> ·
+      <a href="?console=warn">เหลือ warn/error (default)</a>
+      — หรือใน code: <code>window.ELITJS_LOG_CONFIG = { console: false }</code> ก่อน import,
+      <code>__ELITJS_LOG__.setConsoleLevel(false)</code> ตอน runtime, หรือ dropdown ใน panel
+    </p>
+
+    <div class="btns">
+      <button data-lv="trace">trace</button>
+      <button data-lv="debug">debug</button>
+      <button data-lv="info">info</button>
+      <button data-lv="warn">warn</button>
+      <button data-lv="error">error</button>
+      <button id="lazy">lazy + big object</button>
+      <button id="boom">throw + log.error</button>
+      <button id="stop">หยุด/เล่น activity ต่อ</button>
+    </div>
+
+    <p id="live">activity ยังไม่เริ่ม — กดปุ่ม level ใด ๆ เพื่อเริ่ม</p>
+
+    <!-- config @elitjs/log ก่อน import: เปิดจับ "ไฟล์:บรรทัด" ของที่เรียก log เพื่อโชว์ใน panel -->
+    <script>
+      window.ELITJS_LOG_CONFIG = { src: true };
+    </script>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

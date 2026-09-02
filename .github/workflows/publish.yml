@@ -1,0 +1,72 @@
+# Publish @elitjs/log ขึ้น npm — ทำงานเมื่อ push tag v* (เช่น v0.6.0)
+#
+# ของที่ต้องเตรียมครั้งเดียว:
+#   1. สร้าง token ที่ npmjs.com → Access Tokens → Generate New Token → type "Automation"
+#   2. ใส่ไว้ที่ repo settings → Secrets and variables → Actions → ชื่อ NPM_TOKEN
+#      (ถ้า @elitjs เป็น org บน npm ต้องมีสิทธิ์ publish ใน scope นั้นด้วย)
+#
+# วิธีปล่อยเวอร์ชัน:
+#   npm version patch|minor|major   # อัปเดต package.json + สร้าง tag ให้
+#   git push --follow-tags
+#   → workflow รัน: install → typecheck → test → build → ตรวจ tag ตรง version → npm publish
+#
+# หมายเหตุ: --provenance ต้องใช้ repo สาธารณะ + id-token: write (ใส่ไว้ให้แล้ว)
+#           ถ้า repo ส่วนตัวหรือไม่ต้องการ ก็ลบ flag นี้พร้อม permissions id-token ได้
+
+name: Publish to npm
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch: {} # อนุญาตให้รันมือ (กรณี fix token แล้ว retry — publish ซ้ำจะโดน npm ปัดตกเอง)
+
+permissions:
+  contents: read
+  id-token: write # สำหรับ npm provenance
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: ตรวจว่า tag ตรงกับ version ใน package.json (กัน publish ผิดเวอร์ชัน)
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          PKG_VERSION="v$(node -p "require('./package.json').version")"
+          if [ "$PKG_VERSION" != "${GITHUB_REF_NAME}" ]; then
+            echo "::error::tag (${GITHUB_REF_NAME}) ไม่ตรงกับ package.json (${PKG_VERSION})"
+            exit 1
+          fi
+
+      - name: ตรวจว่า dist ครบก่อนแพ็ก (กัน publish แพ็กเกจเปล่า)
+        run: |
+          test -f dist/node.js
+          test -f dist/browser.js
+          test -f dist/core.js
+
+      - name: Publish
+        run: npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

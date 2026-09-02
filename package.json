@@ -1,0 +1,48 @@
+{
+  "name": "@elitjs/log",
+  "version": "0.6.0",
+  "description": "Zero-dependency logger for Node & browser — env-controlled, near-zero cost when disabled, viewable via custom DevTools extension",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elitjs/log.git"
+  },
+  "homepage": "https://github.com/elitjs/log#readme",
+  "bugs": "https://github.com/elitjs/log/issues",
+  "keywords": [
+    "logger",
+    "logging",
+    "console",
+    "devtools",
+    "browser",
+    "node",
+    "zero-dependency"
+  ],
+  "type": "module",
+  "main": "./dist/node.js",
+  "types": "./dist/node.d.ts",
+  "exports": {
+    ".": "./dist/node.js",
+    "./browser": "./dist/browser.js",
+    "./core": "./dist/core.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "node tools/make-icons.mjs && tsc -p tsconfig.build.json && tsc -p tsconfig.extension.json",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "node --test \"test/*.test.ts\"",
+    "demo": "node example.ts",
+    "demo:browser": "node server.ts",
+    "bench": "node bench.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.3",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=22.6"
+  }
+}

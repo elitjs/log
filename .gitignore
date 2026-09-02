@@ -1,0 +1,28 @@
+# dependencies
+node_modules/
+
+# build output — สร้างใหม่ได้เสมอด้วย npm run build
+dist/
+# extension/panel.js
+# extension/devtools.js
+# extension/icons/
+
+# TypeScript
+*.tsbuildinfo
+
+# env / secrets
+.env
+.env.*
+
+# logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE
+.idea/
+.vscode/

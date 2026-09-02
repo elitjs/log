@@ -1,0 +1,185 @@
+:root {
+  --bg: #1e1e1e;
+  --fg: #d4d4d4;
+  --dim: #9e9e9e;
+  --line: #3a3a3a;
+  --trace: #9e9e9e;
+  --debug: #4dd0e1;
+  --info: #81c784;
+  --warn: #ffb74d;
+  --error: #e57373;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  font: 12px/1.5 ui-monospace, Consolas, 'Courier New', monospace;
+  color: var(--fg);
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+}
+
+#toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--line);
+  background: #252526;
+  flex: none;
+}
+
+#toolbar label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--dim);
+}
+
+#toolbar select,
+#toolbar input {
+  background: #333;
+  color: var(--fg);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  font: inherit;
+  padding: 2px 4px;
+}
+
+#toolbar button {
+  background: #333;
+  color: var(--fg);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  font: inherit;
+  padding: 3px 10px;
+  cursor: pointer;
+}
+
+#toolbar button:hover {
+  background: #444;
+}
+
+#toolbar button.active {
+  background: #5a3d2e;
+  border-color: #b0713a;
+}
+
+#status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #888;
+  flex: none;
+}
+
+.dot.ok {
+  background: #81c784;
+}
+
+.dot.bad {
+  background: #e57373;
+}
+
+#status-text {
+  color: var(--dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#rows {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 1px 10px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.row:hover {
+  background: #2a2d2e;
+}
+
+.row.has-raw {
+  cursor: pointer;
+}
+
+.row .time {
+  color: #6f6f6f;
+  flex: none;
+}
+
+.row .badge {
+  flex: none;
+  font-weight: bold;
+}
+
+.row.lv-trace .badge { color: var(--trace); }
+.row.lv-debug .badge { color: var(--debug); }
+.row.lv-info .badge { color: var(--info); }
+.row.lv-warn .badge { color: var(--warn); }
+.row.lv-error .badge { color: var(--error); }
+
+.row.lv-warn {
+  background: rgba(255, 183, 77, 0.06);
+}
+
+.row.lv-error {
+  background: rgba(229, 115, 115, 0.09);
+}
+
+.row .ns {
+  color: var(--dim);
+  flex: none;
+}
+
+.row .msg {
+  flex: 1;
+  min-width: 0;
+}
+
+.row .src {
+  color: #5f8fb4;
+  flex: none;
+  font-size: 11px;
+  user-select: text;
+}
+
+.detail {
+  margin: 0 10px 4px 10px;
+  padding: 6px 8px;
+  background: #141414;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  color: #9cdcfe;
+  white-space: pre-wrap;
+  word-break: break-all;
+  font: inherit;
+}
+
+#toolbar #toggle-log.off {
+  background: #4a2526;
+  border-color: #8c3f42;
+  color: #e57373;
+}

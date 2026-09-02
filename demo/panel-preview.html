@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8" />
+    <title>Elit.JS Log panel — preview นอก DevTools</title>
+    <!--
+      หน้านี้ใช้ดูหน้าตา panel ของ extension โดยไม่ต้องเปิด Chrome DevTools:
+      stub chrome.devtools ให้ panel.js แล้วปั่น log ปลอมเข้ามาเรื่อย ๆ
+      ใช้เวลา iterate หน้าตา panel (แก้ src/extension/panel.ts แล้ว npm run build แล้ว refresh หน้านี้)
+    -->
+    <link rel="stylesheet" href="../extension/panel.css" />
+  </head>
+  <body>
+    <div id="toolbar">
+      <span id="status"><span id="status-dot" class="dot"></span><span id="status-text">กำลังเชื่อมต่อ...</span></span>
+
+      <label>Level
+        <select id="level-filter">
+          <option value="trace" selected>All (trace)</option>
+          <option value="debug">debug+</option>
+          <option value="info">info+</option>
+          <option value="warn">warn+</option>
+          <option value="error">error</option>
+        </select>
+      </label>
+
+      <label>ns <input id="ns-filter" type="text" placeholder="กรอง namespace" size="10" /></label>
+      <label>ค้นหา <input id="search" type="text" placeholder="ข้อความ" size="12" /></label>
+
+      <button id="toggle-log" title="เปิด/ปิด log ทั้งหน้าเว็บ (master switch — ปิดแล้ว panel จะไม่เห็น log)">⏻ Log: on</button>
+      <button id="pause" title="หยุด/เล่นต่อการดึง log">⏸ Pause</button>
+      <button id="clear" title="ล้าง log ทั้งใน panel และในหน้าเว็บ">🗑 Clear</button>
+
+      <label title="สั่งหน้าเว็บให้ echo log ลง console ด้วย">
+        console echo
+        <select id="console-echo">
+          <option value="silent">silent</option>
+          <option value="trace">trace</option>
+          <option value="debug">debug</option>
+          <option value="info">info</option>
+          <option value="warn" selected>warn</option>
+          <option value="error">error</option>
+        </select>
+      </label>
+    </div>
+
+    <div id="rows"></div>
+
+    <script>
+      (function () {
+        'use strict';
+        var entries = [];
+        var seq = 0;
+        function push(level, ns, msg, raw, src) {
+          entries.push({ seq: ++seq, t: Date.now(), level: level, ns: ns, msg: msg, src: src ?? null, raw: raw ?? null });
+          if (entries.length > 300) entries.splice(0, entries.length - 300);
+        }
+
+        // ข้อมูลตัวอย่าง — คล้าย output จริงที่ได้จากหน้า demo
+        push('info', 'shop', 'app booted (@elitjs/log browser demo)', null, 'http://localhost:4173/demo/app.js:14:1');
+        push('debug', 'shop:http', 'GET /api/cart -> 42ms', null, 'http://localhost:4173/demo/app.js:17:3');
+        push('trace', 'shop:db', 'query: SELECT * FROM users WHERE id = ?', null, 'http://localhost:4173/demo/app.js:18:5');
+        push('warn', 'shop:http', 'slow request /api/checkout took 187ms', null, 'http://localhost:4173/demo/app.js:19:5');
+        push('debug', 'shop:http', 'cart snapshot: {"user":42,"items":[{"id":0,"qty":1},{"id":1,"qty":2}]}',
+          '["cart snapshot: %j",{"user":42,"items":[{"id":0,"qty":1},{"id":1,"qty":2}]}]',
+          'http://localhost:4173/demo/app.js:26:5');
+        push('error', 'shop:payment', 'payment failed for order 1001 Error: simulated checkout failure',
+          '["payment failed for order %d",1001,{"name":"Error","message":"simulated checkout failure","stack":"Error: simulated checkout failure\\n    at HTMLButtonElement.<anonymous> (http://localhost:4173/demo/app.js:60:15)\\n    at ..."}]',
+          'http://localhost:4173/demo/app.js:59:7');
+
+        window.chrome = {
+          devtools: {
+            inspectedWindow: {
+              eval: function (expr, cb) {
+                var m = /dump\((\d+)\)/.exec(expr);
+                var since = m ? Number(m[1]) : 0;
+                if (/setConsoleLevel\('(\w+)'\)/.test(expr)) {
+                  window.__previewEcho = RegExp.$1;
+                }
+                if (/setEnabled\((true|false)\)/.test(expr)) {
+                  window.__previewEnabled = RegExp.$1 === 'true';
+                }
+                var enabled = window.__previewEnabled !== false;
+                setTimeout(function () {
+                  cb(
+                    {
+                      lastSeq: seq,
+                      entries: enabled ? entries.filter(function (e) { return e.seq > since; }) : [],
+                      state: {
+                        consoleLevel: window.__previewEcho || 'warn',
+                        ns: null,
+                        cap: 1000,
+                        src: true,
+                        buffer: enabled,
+                        enabled: enabled,
+                      },
+                    },
+                    false,
+                  );
+                }, 30);
+              },
+            },
+            network: { onNavigated: { addListener: function () {} } },
+            panels: { create: function () {} },
+          },
+        };
+
+        // ปั่น log ใหม่เรื่อย ๆ เพื่อดู live behavior (auto-scroll, badge สี)
+        var n = 0;
+        var levels = ['trace', 'debug', 'info', 'warn', 'error'];
+        setInterval(function () {
+          n++;
+          push(levels[n % 5], n % 2 ? 'shop:http' : 'shop:db', 'generated entry #' + n + ' — panel poll ทุก 750ms');
+        }, 1000);
+      })();
+    </script>
+    <script src="../extension/panel.js"></script>
+  </body>
+</html>

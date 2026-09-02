@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8" />
+    <title>Elit.JS Log</title>
+    <link rel="stylesheet" href="panel.css" />
+  </head>
+  <body>
+    <div id="toolbar">
+      <span id="status"><span id="status-dot" class="dot"></span><span id="status-text">กำลังเชื่อมต่อ...</span></span>
+
+      <label>Level
+        <select id="level-filter">
+          <option value="trace" selected>All (trace)</option>
+          <option value="debug">debug+</option>
+          <option value="info">info+</option>
+          <option value="warn">warn+</option>
+          <option value="error">error</option>
+        </select>
+      </label>
+
+      <label>ns <input id="ns-filter" type="text" placeholder="กรอง namespace" size="10" /></label>
+      <label>ค้นหา <input id="search" type="text" placeholder="ข้อความ" size="12" /></label>
+
+      <button id="toggle-log" title="เปิด/ปิด log ทั้งหน้าเว็บ (master switch — ปิดแล้ว panel จะไม่เห็น log)">⏻ Log: on</button>
+      <button id="pause" title="หยุด/เล่นต่อการดึง log">⏸ Pause</button>
+      <button id="clear" title="ล้าง log ทั้งใน panel และในหน้าเว็บ">🗑 Clear</button>
+
+      <label title="สั่งหน้าเว็บให้ echo log ลง console ด้วย (กระทบเฉพาะ console ไม่กระทบ buffer)">
+        console echo
+        <select id="console-echo">
+          <option value="silent">silent</option>
+          <option value="trace">trace</option>
+          <option value="debug">debug</option>
+          <option value="info">info</option>
+          <option value="warn" selected>warn</option>
+          <option value="error">error</option>
+        </select>
+      </label>
+    </div>
+
+    <div id="rows"></div>
+
+    <script src="panel.js"></script>
+  </body>
+</html>
